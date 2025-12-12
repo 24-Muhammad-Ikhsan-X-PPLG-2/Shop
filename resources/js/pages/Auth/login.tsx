@@ -2,10 +2,9 @@ import LoginFooter from '@/components/Auth/LoginFooter';
 import LoginForm from '@/components/Auth/LoginForm';
 import LoginHeader from '@/components/Auth/LoginHeader';
 import LoginHero from '@/components/Auth/LoginHero';
-import { Head, usePage } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 
 const Login = () => {
-    const { flash } = usePage().props;
     return (
         <>
             <Head title="Sign In"></Head>

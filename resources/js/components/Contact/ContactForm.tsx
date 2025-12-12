@@ -22,7 +22,7 @@ const ContactForm = () => {
             subject: '',
         },
     });
-    const handleSend: SubmitHandler<FormType> = (data) => {
+    const handleSend: SubmitHandler<FormType> = () => {
         alert('Yay!!');
     };
     return (
