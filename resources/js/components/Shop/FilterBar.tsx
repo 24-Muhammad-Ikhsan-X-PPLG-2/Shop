@@ -1,11 +1,97 @@
+import { router } from '@inertiajs/react';
 import { ChevronDown, SlidersHorizontal, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+const priceRanges = {
+    all: { min: null, max: null },
+    under50: { min: null, max: 50 },
+    between50_100: { min: 50, max: 100 },
+    between100_200: { min: 100, max: 200 },
+    over200: { min: 200, max: null },
+} as const;
+type PriceRangesKey = keyof typeof priceRanges;
 
 const FilterBar = () => {
     const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState('All');
     const [selectedSort, setSelectedSort] = useState('Newest');
+    const [selectedPrices, setSelectedPrices] = useState('all');
+    const [selectedSize, setSelectedSize] = useState('all');
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const category = params.get('category') ?? 'All';
+        const size = params.get('size') ?? 'all';
+        const price_max = params.get('price_max') ?? '';
+        const price_min = params.get('price_min') ?? '';
+        if (price_max == '50' && price_min == '') {
+            setSelectedPrices('under50');
+        } else if (price_max == '100' && price_min == '50') {
+            setSelectedPrices('between50_100');
+        } else if (price_max == '200' && price_min == '100') {
+            setSelectedPrices('between100_200');
+        } else if (price_min == '200' && price_max == '') {
+            setSelectedPrices('over200');
+        } else {
+            setSelectedPrices('all');
+        }
+        setSelectedCategory(category);
+        setSelectedSize(size);
+    }, []);
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        if (selectedCategory === 'all') {
+            params.delete('category');
+        } else {
+            params.set('category', selectedCategory.toLocaleLowerCase());
+        }
+        router.get(
+            `/shop?${params.toString()}`,
+            {},
+            {
+                preserveScroll: true,
+                preserveState: true,
+            },
+        );
+    }, [selectedCategory]);
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        if (selectedPrices === 'all') {
+            params.delete('price_min');
+            params.delete('price_max');
+        } else {
+            const range = priceRanges[selectedPrices as PriceRangesKey];
+
+            if (range.min !== null) params.set('price_min', range.min.toString());
+            else params.delete('price_min');
+
+            if (range.max !== null) params.set('price_max', range.max.toString());
+            else params.delete('price_max');
+        }
+        router.get(
+            `/shop?${params.toString()}`,
+            {},
+            {
+                preserveState: true,
+                preserveScroll: true,
+            },
+        );
+    }, [selectedPrices]);
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        if (selectedSize === 'all') {
+            params.delete('size');
+        } else {
+            params.set('size', selectedSize);
+        }
+        router.get(
+            `/shop?${params.toString()}`,
+            {},
+            {
+                preserveScroll: true,
+                preserveState: true,
+            },
+        );
+    }, [selectedSize]);
     return (
         <>
             {/* Desktop Filter Bar */}
@@ -20,37 +106,45 @@ const FilterBar = () => {
                                     onChange={(e) => setSelectedCategory(e.target.value)}
                                     className="cursor-pointer appearance-none rounded-full border border-neutral-200 bg-neutral-50 px-4 py-2 pr-10 transition-colors outline-none focus:border-neutral-400"
                                 >
-                                    <option>All</option>
-                                    <option>Men</option>
-                                    <option>Women</option>
-                                    <option>Casual</option>
-                                    <option>Formal</option>
+                                    <option value={'all'}>All</option>
+                                    <option value={'men'}>Men</option>
+                                    <option value={'women'}>Women</option>
+                                    <option value={'casual'}>Casual</option>
+                                    <option value={'formal'}>Formal</option>
                                 </select>
                                 <ChevronDown className="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 text-neutral-600" />
                             </div>
 
                             {/* Price Range */}
                             <div className="relative">
-                                <select className="cursor-pointer appearance-none rounded-full border border-neutral-200 bg-neutral-50 px-4 py-2 pr-10 transition-colors outline-none focus:border-neutral-400">
-                                    <option>All Prices</option>
-                                    <option>Under $50</option>
-                                    <option>$50 - $100</option>
-                                    <option>$100 - $200</option>
-                                    <option>Over $200</option>
+                                <select
+                                    className="cursor-pointer appearance-none rounded-full border border-neutral-200 bg-neutral-50 px-4 py-2 pr-10 transition-colors outline-none focus:border-neutral-400"
+                                    value={selectedPrices}
+                                    onChange={(e) => setSelectedPrices(e.target.value)}
+                                >
+                                    <option value="all">All Prices</option>
+                                    <option value="under50">Under $50</option>
+                                    <option value="between50_100">$50 - $100</option>
+                                    <option value="between100_200">$100 - $200</option>
+                                    <option value="over200">Over $200</option>
                                 </select>
                                 <ChevronDown className="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 text-neutral-600" />
                             </div>
 
                             {/* Size Filter */}
                             <div className="relative">
-                                <select className="cursor-pointer appearance-none rounded-full border border-neutral-200 bg-neutral-50 px-4 py-2 pr-10 transition-colors outline-none focus:border-neutral-400">
-                                    <option>All Sizes</option>
-                                    <option>XS</option>
-                                    <option>S</option>
-                                    <option>M</option>
-                                    <option>L</option>
-                                    <option>XL</option>
-                                    <option>XXL</option>
+                                <select
+                                    className="cursor-pointer appearance-none rounded-full border border-neutral-200 bg-neutral-50 px-4 py-2 pr-10 transition-colors outline-none focus:border-neutral-400"
+                                    value={selectedSize}
+                                    onChange={(e) => setSelectedSize(e.target.value)}
+                                >
+                                    <option value="all">All Sizes</option>
+                                    <option value="xs">XS</option>
+                                    <option value="s">S</option>
+                                    <option value="m">M</option>
+                                    <option value="l">L</option>
+                                    <option value={'xl'}>XL</option>
+                                    <option value={'xxl'}>XXL</option>
                                 </select>
                                 <ChevronDown className="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 text-neutral-600" />
                             </div>

@@ -1,7 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Link } from '@inertiajs/react';
-import { Eye, EyeOff, Lock, Mail } from 'lucide-react';
-import { useState } from 'react';
+import { Link, router, usePage } from '@inertiajs/react';
+import { Eye, EyeOff, Lock, Mail, X } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
+import { useEffect, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import z from 'zod';
 
@@ -14,6 +15,11 @@ type schemaFormType = z.infer<typeof schemaForm>;
 
 const LoginForm = () => {
     const [showPassword, setShowPassword] = useState(false);
+    const {
+        props: { errors, flash },
+    } = usePage();
+    const [showSuccessPanel, setShowSuccessPanel] = useState(false);
+    const [showErrorPanel, setShowErrorPanel] = useState(false);
     const { register, handleSubmit } = useForm<schemaFormType>({
         resolver: zodResolver(schemaForm),
         defaultValues: {
@@ -22,22 +28,58 @@ const LoginForm = () => {
         },
     });
 
-    const onLogin: SubmitHandler<schemaFormType> = ({ email, password }) => {
-        alert('YES');
+    const onLogin: SubmitHandler<schemaFormType> = (data) => {
+        router.post('/signin', data);
     };
+    useEffect(() => {
+        if (flash.success) {
+            setShowSuccessPanel(true);
+        } else {
+            setShowSuccessPanel(false);
+        }
+        if (flash.error) {
+            setShowErrorPanel(true);
+        } else {
+            setShowErrorPanel(false);
+        }
+    }, [flash.success, flash.error]);
     return (
         <div className="mx-auto w-full max-w-md">
             {/* Title Section */}
             <div className="mb-8 space-y-2 text-center">
                 <h1 className="text-2xl font-semibold text-neutral-900">Welcome Back</h1>
                 <p className="text-lg text-neutral-600">Log in to continue your shopping experience.</p>
+                <AnimatePresence mode="wait">
+                    {flash.success && showSuccessPanel ? (
+                        <motion.div
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            exit={{ scale: 0 }}
+                            className="relative mt-2 flex items-center justify-center gap-1 rounded-xl border border-green-600 bg-green-300 p-4"
+                        >
+                            <p className="text-center text-green-800">{flash.success}</p>
+                            <X className="absolute top-1 right-1 size-5 cursor-pointer text-green-800" onClick={() => setShowSuccessPanel(false)} />
+                        </motion.div>
+                    ) : null}
+                    {flash.error && showErrorPanel ? (
+                        <motion.div
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            exit={{ scale: 0 }}
+                            className="relative mt-2 flex items-center justify-center gap-1 rounded-xl border border-red-600 bg-red-300 p-4"
+                        >
+                            <p className="text-center text-red-800">{flash.error}</p>
+                            <X className="absolute top-1 right-1 size-5 cursor-pointer text-red-800" onClick={() => setShowErrorPanel(false)} />
+                        </motion.div>
+                    ) : null}
+                </AnimatePresence>
             </div>
 
             {/* Login Form */}
             <form onSubmit={handleSubmit(onLogin)} className="space-y-6">
                 {/* Email Input */}
                 <div className="space-y-2">
-                    <label htmlFor="email" className="block text-neutral-900">
+                    <label htmlFor="email" className={`block ${errors.email ? 'text-red-600' : 'text-neutral-900'}`}>
                         Email
                     </label>
                     <div className="relative">
@@ -47,15 +89,16 @@ const LoginForm = () => {
                             type="email"
                             placeholder="your.email@example.com"
                             required
-                            className="w-full rounded-full border border-neutral-200 bg-neutral-50 px-12 py-3 transition-colors outline-none placeholder:text-neutral-400 focus:border-neutral-400"
+                            className={`w-full rounded-full border bg-neutral-50 px-12 py-3 transition-colors outline-none placeholder:text-neutral-400 ${errors.email ? 'border-red-500 focus:border-red-600' : 'border-neutral-200 focus:border-neutral-400'}`}
                             {...register('email')}
                         />
                     </div>
+                    <p className="text-red-600">{errors.email}</p>
                 </div>
 
                 {/* Password Input */}
                 <div className="space-y-2">
-                    <label htmlFor="password" className="block text-neutral-900">
+                    <label htmlFor="password" className={`block ${errors.password ? 'text-red-600' : 'text-neutral-900'}`}>
                         Password
                     </label>
                     <div className="relative">
@@ -65,17 +108,18 @@ const LoginForm = () => {
                             type={showPassword ? 'text' : 'password'}
                             placeholder="Enter your password"
                             required
-                            className="w-full rounded-full border border-neutral-200 bg-neutral-50 px-12 py-3 transition-colors outline-none placeholder:text-neutral-400 focus:border-neutral-400"
+                            className={`w-full rounded-full border bg-neutral-50 px-12 py-3 transition-colors outline-none placeholder:text-neutral-400 ${errors.password ? 'border-red-500 focus:border-red-600' : 'border-neutral-200 focus:border-neutral-400'}`}
                             {...register('password')}
                         />
                         <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
-                            className="absolute top-1/2 right-4 -translate-y-1/2 text-neutral-400 transition-colors hover:text-neutral-600"
+                            className="absolute top-1/2 right-4 -translate-y-1/2 cursor-pointer text-neutral-400 transition-colors hover:text-neutral-600"
                         >
                             {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                         </button>
                     </div>
+                    <p className="text-red-600">{errors.password}</p>
                 </div>
 
                 {/* Forgot Password */}
@@ -100,7 +144,10 @@ const LoginForm = () => {
 
             {/* Social Login Buttons */}
             <div className="mb-8 grid grid-cols-2 gap-4">
-                <button className="flex items-center justify-center gap-2 rounded-full border border-neutral-200 py-3 transition-colors hover:bg-neutral-50">
+                <button
+                    onClick={() => (window.location.href = '/auth/google')}
+                    className="flex items-center justify-center gap-2 rounded-full border border-neutral-200 py-3 transition-colors hover:bg-neutral-50"
+                >
                     <svg className="h-5 w-5" viewBox="0 0 24 24">
                         <path
                             fill="currentColor"

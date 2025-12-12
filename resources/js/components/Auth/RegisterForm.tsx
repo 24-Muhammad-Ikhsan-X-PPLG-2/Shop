@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Link } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react';
 import { Eye, EyeOff, Lock, Mail, User } from 'lucide-react';
 import { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
@@ -17,8 +17,14 @@ type schemaFormType = z.infer<typeof schemaForm>;
 
 const RegisterForm = () => {
     const [showPassword, setShowPassword] = useState(false);
+    const { errors } = usePage().props;
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-    const { register, handleSubmit } = useForm<schemaFormType>({
+    const {
+        register,
+        handleSubmit,
+        formState: { errors: errorsReact },
+        setError,
+    } = useForm<schemaFormType>({
         resolver: zodResolver(schemaForm),
         defaultValues: {
             agreeToTerms: false,
@@ -30,7 +36,13 @@ const RegisterForm = () => {
     });
 
     const onRegister: SubmitHandler<schemaFormType> = (data) => {
-        alert('YAYAYA');
+        if (data.password !== data.confirmPassword) {
+            setError('confirmPassword', {
+                message: "Password don't match",
+            });
+            return;
+        }
+        router.post('/signup', data);
     };
     return (
         <div className="mx-auto w-full max-w-md">
@@ -44,7 +56,7 @@ const RegisterForm = () => {
             <form onSubmit={handleSubmit(onRegister)} className="space-y-5">
                 {/* Full Name Input */}
                 <div className="space-y-2">
-                    <label htmlFor="fullName" className="block text-neutral-900">
+                    <label htmlFor="fullName" className={`block ${errors.fullName ? 'text-red-600' : 'text-neutral-900'}`}>
                         Full Name
                     </label>
                     <div className="relative">
@@ -54,15 +66,16 @@ const RegisterForm = () => {
                             type="text"
                             placeholder="John Doe"
                             required
-                            className="w-full rounded-full border border-neutral-200 bg-neutral-50 px-12 py-3 transition-colors outline-none placeholder:text-neutral-400 focus:border-neutral-400"
+                            className={`w-full rounded-full border bg-neutral-50 px-12 py-3 transition-colors outline-none placeholder:text-neutral-400 ${errors.fullName ? 'border-red-500 focus:border-red-600' : 'border-neutral-200 focus:border-neutral-400'}`}
                             {...register('fullName')}
                         />
                     </div>
+                    <p className="text-red-600">{errors.fullName}</p>
                 </div>
 
                 {/* Email Input */}
                 <div className="space-y-2">
-                    <label htmlFor="email" className="block text-neutral-900">
+                    <label htmlFor="email" className={`block ${errors.email ? 'text-red-600' : 'text-neutral-900'}`}>
                         Email
                     </label>
                     <div className="relative">
@@ -72,15 +85,16 @@ const RegisterForm = () => {
                             type="email"
                             placeholder="your.email@example.com"
                             required
-                            className="w-full rounded-full border border-neutral-200 bg-neutral-50 px-12 py-3 transition-colors outline-none placeholder:text-neutral-400 focus:border-neutral-400"
+                            className={`w-full rounded-full border bg-neutral-50 px-12 py-3 transition-colors outline-none placeholder:text-neutral-400 ${errors.email ? 'border-red-500 focus:border-red-600' : 'border-neutral-200 focus:border-neutral-400'}`}
                             {...register('email')}
                         />
                     </div>
+                    <p className="text-red-600">{errors.email}</p>
                 </div>
 
                 {/* Password Input */}
                 <div className="space-y-2">
-                    <label htmlFor="password" className="block text-neutral-900">
+                    <label htmlFor="password" className={`block ${errors.password ? 'text-red-600' : 'text-neutral-900'}`}>
                         Password
                     </label>
                     <div className="relative">
@@ -90,7 +104,7 @@ const RegisterForm = () => {
                             type={showPassword ? 'text' : 'password'}
                             placeholder="Create a password"
                             required
-                            className="w-full rounded-full border border-neutral-200 bg-neutral-50 px-12 py-3 transition-colors outline-none placeholder:text-neutral-400 focus:border-neutral-400"
+                            className={`w-full rounded-full border bg-neutral-50 px-12 py-3 transition-colors outline-none placeholder:text-neutral-400 ${errors.password ? 'border-red-500 focus:border-red-600' : 'border-neutral-200 focus:border-neutral-400'}`}
                             {...register('password')}
                         />
                         <button
@@ -101,11 +115,12 @@ const RegisterForm = () => {
                             {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                         </button>
                     </div>
+                    <p className="text-red-600">{errors.password}</p>
                 </div>
 
                 {/* Confirm Password Input */}
                 <div className="space-y-2">
-                    <label htmlFor="confirmPassword" className="block text-neutral-900">
+                    <label htmlFor="confirmPassword" className={`block ${errorsReact.confirmPassword ? 'text-red-600' : 'text-neutral-900'}`}>
                         Confirm Password
                     </label>
                     <div className="relative">
@@ -115,7 +130,7 @@ const RegisterForm = () => {
                             type={showConfirmPassword ? 'text' : 'password'}
                             placeholder="Re-enter your password"
                             required
-                            className="w-full rounded-full border border-neutral-200 bg-neutral-50 px-12 py-3 transition-colors outline-none placeholder:text-neutral-400 focus:border-neutral-400"
+                            className={`w-full rounded-full border bg-neutral-50 px-12 py-3 transition-colors outline-none placeholder:text-neutral-400 ${errorsReact.confirmPassword ? 'border-red-500 focus:border-red-600' : 'border-neutral-200 focus:border-neutral-400'}`}
                             {...register('confirmPassword')}
                         />
                         <button
@@ -126,6 +141,7 @@ const RegisterForm = () => {
                             {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                         </button>
                     </div>
+                    <p className="text-red-600">{errorsReact?.confirmPassword?.message}</p>
                 </div>
 
                 {/* Terms & Privacy Checkbox */}
@@ -198,7 +214,7 @@ const RegisterForm = () => {
                 <p className="text-neutral-600">
                     Already have an account?{' '}
                     <Link href="/signin" className="text-neutral-900 hover:underline">
-                        Log In
+                        Sign In
                     </Link>
                 </p>
             </div>

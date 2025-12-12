@@ -19,6 +19,7 @@ class Product extends Model
     public $timestamps = true;
     protected $fillable = [
         'name',
+        'slug',
         'image_url',
         'description',
         'category',
@@ -26,6 +27,7 @@ class Product extends Model
         'price',
         'sizes',
         'colors',
+        'brand',
         'stock_quantity',
     ];
     public function getAllProducts($orderBy = 'name', $direction = 'asc')
