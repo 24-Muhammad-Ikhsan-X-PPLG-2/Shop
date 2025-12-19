@@ -14,15 +14,18 @@ type PriceRangesKey = keyof typeof priceRanges;
 const FilterBar = () => {
     const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState('All');
-    const [selectedSort, setSelectedSort] = useState('Newest');
+    const [selectedSort, setSelectedSort] = useState('');
     const [selectedPrices, setSelectedPrices] = useState('all');
     const [selectedSize, setSelectedSize] = useState('all');
+    const [selectedColors, setSelectedColors] = useState('all');
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
         const category = params.get('category') ?? 'All';
         const size = params.get('size') ?? 'all';
         const price_max = params.get('price_max') ?? '';
+        const sort = params.get('sort') ?? '';
         const price_min = params.get('price_min') ?? '';
+        const color = params.get('color') ?? 'all';
         if (price_max == '50' && price_min == '') {
             setSelectedPrices('under50');
         } else if (price_max == '100' && price_min == '50') {
@@ -36,6 +39,8 @@ const FilterBar = () => {
         }
         setSelectedCategory(category);
         setSelectedSize(size);
+        setSelectedColors(color);
+        setSelectedSort(sort);
     }, []);
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
@@ -92,6 +97,38 @@ const FilterBar = () => {
             },
         );
     }, [selectedSize]);
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        if (selectedColors === 'all') {
+            params.delete('color');
+        } else {
+            params.set('color', selectedColors);
+        }
+        router.get(
+            `/shop?${params.toString()}`,
+            {},
+            {
+                preserveScroll: true,
+                preserveState: true,
+            },
+        );
+    }, [selectedColors]);
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        if (selectedSort === '') {
+            params.set('sort', 'newest');
+        } else {
+            params.set('sort', selectedSort);
+        }
+        router.get(
+            `/shop?${params.toString()}`,
+            {},
+            {
+                preserveScroll: true,
+                preserveState: true,
+            },
+        );
+    }, [selectedSort]);
     return (
         <>
             {/* Desktop Filter Bar */}
@@ -111,6 +148,11 @@ const FilterBar = () => {
                                     <option value={'women'}>Women</option>
                                     <option value={'casual'}>Casual</option>
                                     <option value={'formal'}>Formal</option>
+                                    <option value={'accessories'}>Accessories</option>
+                                    <option value={'new_arrivals'}>New Arrivals</option>
+                                    <option value={'activewear'}>Activewear</option>
+                                    <option value={'footwear'}>Footwear</option>
+                                    <option value={'summer_collection'}>Summer Collection</option>
                                 </select>
                                 <ChevronDown className="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 text-neutral-600" />
                             </div>
@@ -151,14 +193,18 @@ const FilterBar = () => {
 
                             {/* Color Filter */}
                             <div className="relative">
-                                <select className="cursor-pointer appearance-none rounded-full border border-neutral-200 bg-neutral-50 px-4 py-2 pr-10 transition-colors outline-none focus:border-neutral-400">
-                                    <option>All Colors</option>
-                                    <option>Black</option>
-                                    <option>White</option>
-                                    <option>Gray</option>
-                                    <option>Blue</option>
-                                    <option>Red</option>
-                                    <option>Green</option>
+                                <select
+                                    className="cursor-pointer appearance-none rounded-full border border-neutral-200 bg-neutral-50 px-4 py-2 pr-10 transition-colors outline-none focus:border-neutral-400"
+                                    value={selectedColors}
+                                    onChange={({ target: { value } }) => setSelectedColors(value)}
+                                >
+                                    <option value={'all'}>All Colors</option>
+                                    <option value={'black'}>Black</option>
+                                    <option value={'white'}>White</option>
+                                    <option value={'gray'}>Gray</option>
+                                    <option value={'blue'}>Blue</option>
+                                    <option value={'redd'}>Red</option>
+                                    <option value={'green'}>Green</option>
                                 </select>
                                 <ChevronDown className="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 text-neutral-600" />
                             </div>
@@ -171,10 +217,10 @@ const FilterBar = () => {
                                 onChange={(e) => setSelectedSort(e.target.value)}
                                 className="cursor-pointer appearance-none rounded-full border border-neutral-200 bg-neutral-50 px-4 py-2 pr-10 transition-colors outline-none focus:border-neutral-400"
                             >
-                                <option>Newest</option>
-                                <option>Popular</option>
-                                <option>Price: Low to High</option>
-                                <option>Price: High to Low</option>
+                                <option value={'newest'}>Newest</option>
+                                <option value={'popular'}>Popular</option>
+                                <option value={'price_low'}>Price: Low to High</option>
+                                <option value={'price_high'}>Price: High to Low</option>
                             </select>
                             <ChevronDown className="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 text-neutral-600" />
                         </div>
@@ -200,10 +246,10 @@ const FilterBar = () => {
                                 onChange={(e) => setSelectedSort(e.target.value)}
                                 className="cursor-pointer appearance-none rounded-full border border-neutral-200 bg-neutral-50 px-4 py-2 pr-10 transition-colors outline-none focus:border-neutral-400"
                             >
-                                <option>Newest</option>
-                                <option>Popular</option>
-                                <option>Price: Low to High</option>
-                                <option>Price: High to Low</option>
+                                <option value={'newest'}>Newest</option>
+                                <option value={'popular'}>Popular</option>
+                                <option value={'price_low'}>Price: Low to High</option>
+                                <option value={'price_high'}>Price: High to Low</option>
                             </select>
                             <ChevronDown className="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 text-neutral-600" />
                         </div>
@@ -244,51 +290,68 @@ const FilterBar = () => {
                                         onChange={(e) => setSelectedCategory(e.target.value)}
                                         className="w-full appearance-none rounded-2xl border border-neutral-200 bg-neutral-50 px-4 py-3 transition-colors outline-none focus:border-neutral-400"
                                     >
-                                        <option>All</option>
-                                        <option>Men</option>
-                                        <option>Women</option>
-                                        <option>Casual</option>
-                                        <option>Formal</option>
+                                        <option value={'all'}>All</option>
+                                        <option value={'men'}>Men</option>
+                                        <option value={'women'}>Women</option>
+                                        <option value={'casual'}>Casual</option>
+                                        <option value={'formal'}>Formal</option>
+                                        <option value={'accessories'}>Accessories</option>
+                                        <option value={'new_arrivals'}>New Arrivals</option>
+                                        <option value={'activewear'}>Activewear</option>
+                                        <option value={'footwear'}>Footwear</option>
+                                        <option value={'summer_collection'}>Summer Collection</option>
                                     </select>
                                 </div>
 
                                 {/* Price Range */}
                                 <div className="space-y-3">
                                     <label className="text-neutral-900">Price Range</label>
-                                    <select className="w-full appearance-none rounded-2xl border border-neutral-200 bg-neutral-50 px-4 py-3 transition-colors outline-none focus:border-neutral-400">
-                                        <option>All Prices</option>
-                                        <option>Under $50</option>
-                                        <option>$50 - $100</option>
-                                        <option>$100 - $200</option>
-                                        <option>Over $200</option>
+                                    <select
+                                        className="w-full appearance-none rounded-2xl border border-neutral-200 bg-neutral-50 px-4 py-3 transition-colors outline-none focus:border-neutral-400"
+                                        value={selectedPrices}
+                                        onChange={(e) => setSelectedPrices(e.target.value)}
+                                    >
+                                        <option value="all">All Prices</option>
+                                        <option value="under50">Under $50</option>
+                                        <option value="between50_100">$50 - $100</option>
+                                        <option value="between100_200">$100 - $200</option>
+                                        <option value="over200">Over $200</option>
                                     </select>
                                 </div>
 
                                 {/* Size */}
                                 <div className="space-y-3">
                                     <label className="text-neutral-900">Size</label>
-                                    <select className="w-full appearance-none rounded-2xl border border-neutral-200 bg-neutral-50 px-4 py-3 transition-colors outline-none focus:border-neutral-400">
-                                        <option>All Sizes</option>
-                                        <option>XS</option>
-                                        <option>S</option>
-                                        <option>M</option>
-                                        <option>L</option>
-                                        <option>XL</option>
-                                        <option>XXL</option>
+                                    <select
+                                        className="w-full appearance-none rounded-2xl border border-neutral-200 bg-neutral-50 px-4 py-3 transition-colors outline-none focus:border-neutral-400"
+                                        value={selectedSize}
+                                        onChange={(e) => setSelectedSize(e.target.value)}
+                                    >
+                                        <option value="all">All Sizes</option>
+                                        <option value="xs">XS</option>
+                                        <option value="s">S</option>
+                                        <option value="m">M</option>
+                                        <option value="l">L</option>
+                                        <option value={'xl'}>XL</option>
+                                        <option value={'xxl'}>XXL</option>
                                     </select>
                                 </div>
 
                                 {/* Color */}
                                 <div className="space-y-3">
                                     <label className="text-neutral-900">Color</label>
-                                    <select className="w-full appearance-none rounded-2xl border border-neutral-200 bg-neutral-50 px-4 py-3 transition-colors outline-none focus:border-neutral-400">
-                                        <option>All Colors</option>
-                                        <option>Black</option>
-                                        <option>White</option>
-                                        <option>Gray</option>
-                                        <option>Blue</option>
-                                        <option>Red</option>
-                                        <option>Green</option>
+                                    <select
+                                        className="w-full appearance-none rounded-2xl border border-neutral-200 bg-neutral-50 px-4 py-3 transition-colors outline-none focus:border-neutral-400"
+                                        value={selectedColors}
+                                        onChange={(e) => setSelectedColors(e.target.value)}
+                                    >
+                                        <option value={'all'}>All Colors</option>
+                                        <option value={'black'}>Black</option>
+                                        <option value={'white'}>White</option>
+                                        <option value={'gray'}>Gray</option>
+                                        <option value={'blue'}>Blue</option>
+                                        <option value={'redd'}>Red</option>
+                                        <option value={'green'}>Green</option>
                                     </select>
                                 </div>
 

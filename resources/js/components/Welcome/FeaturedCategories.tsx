@@ -1,3 +1,5 @@
+import { slugify } from '@/lib/utils';
+import { Link } from '@inertiajs/react';
 import { ImageWithFallback } from '../ImageWithFallback';
 
 const categories = [
@@ -34,19 +36,21 @@ const FeaturedCategories = () => {
 
                 <div className="grid grid-cols-2 gap-6 lg:grid-cols-4">
                     {categories.map((category) => (
-                        <div key={category.id} className="group cursor-pointer">
-                            <div className="relative mb-4 h-80 overflow-hidden rounded-2xl">
-                                <ImageWithFallback
-                                    src={category.image}
-                                    alt={category.title}
-                                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                                <div className="absolute bottom-6 left-6">
-                                    <h3 className="text-[18px] font-medium text-white">{category.title}</h3>
+                        <Link key={category.id} href={`/shop?category=${slugify(category.title)}`}>
+                            <div className="group cursor-pointer">
+                                <div className="relative mb-4 h-80 overflow-hidden rounded-2xl">
+                                    <ImageWithFallback
+                                        src={category.image}
+                                        alt={category.title}
+                                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                                    <div className="absolute bottom-6 left-6">
+                                        <h3 className="text-[18px] font-medium text-white">{category.title}</h3>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </Link>
                     ))}
                 </div>
             </div>

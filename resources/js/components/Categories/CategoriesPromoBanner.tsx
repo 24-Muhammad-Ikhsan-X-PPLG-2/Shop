@@ -1,3 +1,5 @@
+import { Link } from '@inertiajs/react';
+
 const CategoriesPromoBanner = () => {
     return (
         <section className="bg-white py-16 lg:py-20">
@@ -25,9 +27,11 @@ const CategoriesPromoBanner = () => {
                         </div>
 
                         <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-                            <button className="rounded-full bg-neutral-900 px-8 py-3 text-white transition-colors hover:bg-neutral-800">
-                                Explore All Categories
-                            </button>
+                            <Link href={'/shop'}>
+                                <button className="cursor-pointer rounded-full bg-neutral-900 px-8 py-3 text-white transition-colors hover:bg-neutral-800">
+                                    Explore All Categories
+                                </button>
+                            </Link>
                             <button className="rounded-full border border-neutral-300 bg-white px-8 py-3 text-neutral-900 transition-colors hover:bg-neutral-50">
                                 Style Guide
                             </button>

@@ -53,7 +53,7 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        if (!Auth::attempt($cred)) {
+        if (!Auth::attempt($cred, true)) {
             return back()->withErrors([
                 'email' => 'Incorrect email or password',
                 'password' => 'Incorrect email or password'
@@ -84,9 +84,9 @@ class AuthController extends Controller
                 'email' => $googleUser->getEmail(),
                 'password' => bcrypt(Str::random(16))
             ]);
-            Auth::login($user);
+            Auth::login($user, true);
             return redirect('/shop');
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             return redirect('/signin')->with('error', 'Failed login with google.');
         }
     }

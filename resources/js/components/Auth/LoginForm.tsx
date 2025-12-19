@@ -146,7 +146,7 @@ const LoginForm = () => {
             <div className="mb-8 grid grid-cols-2 gap-4">
                 <button
                     onClick={() => (window.location.href = '/auth/google')}
-                    className="flex items-center justify-center gap-2 rounded-full border border-neutral-200 py-3 transition-colors hover:bg-neutral-50"
+                    className="flex cursor-pointer items-center justify-center gap-2 rounded-full border border-neutral-200 py-3 transition-colors hover:bg-neutral-50"
                 >
                     <svg className="h-5 w-5" viewBox="0 0 24 24">
                         <path

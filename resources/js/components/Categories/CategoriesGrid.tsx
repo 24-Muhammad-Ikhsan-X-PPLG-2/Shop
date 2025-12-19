@@ -1,4 +1,8 @@
+import { slugify } from '@/lib/utils';
+import { CountCategories } from '@/types/db';
+import { Link } from '@inertiajs/react';
 import { ArrowRight } from 'lucide-react';
+import { FC } from 'react';
 import { ImageWithFallback } from '../ImageWithFallback';
 
 const categories = [
@@ -67,43 +71,53 @@ const categories = [
     },
 ];
 
-const CategoriesGrid = () => {
+type CategoriesGridProps = {
+    countCategories: CountCategories;
+};
+
+const CategoriesGrid: FC<CategoriesGridProps> = ({ countCategories }) => {
     return (
         <section className="bg-white py-16 lg:py-24">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8 xl:grid-cols-4">
-                    {categories.map((category) => (
-                        <div
-                            key={category.id}
-                            className="group cursor-pointer overflow-hidden rounded-2xl border border-neutral-100 bg-white transition-all duration-300 hover:shadow-xl"
-                        >
-                            <div className="relative h-72 overflow-hidden bg-neutral-50">
-                                <ImageWithFallback
-                                    src={category.image}
-                                    alt={category.title}
-                                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                    {categories.map((category) => {
+                        const categorySlug = slugify(category.title);
+                        return (
+                            <Link
+                                href={`/shop?category=${categorySlug}`}
+                                key={category.id}
+                                className="group cursor-pointer overflow-hidden rounded-2xl border border-neutral-100 bg-white transition-all duration-300 hover:shadow-xl"
+                            >
+                                <div className="relative h-72 overflow-hidden bg-neutral-50">
+                                    <ImageWithFallback
+                                        src={category.image}
+                                        alt={category.title}
+                                        className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
 
-                                {/* Hover Overlay */}
-                                <div className="absolute inset-0 bg-neutral-900/0 transition-colors duration-300 group-hover:bg-neutral-900/20" />
+                                    {/* Hover Overlay */}
+                                    <div className="absolute inset-0 bg-neutral-900/0 transition-colors duration-300 group-hover:bg-neutral-900/20" />
 
-                                {/* Content Overlay */}
-                                <div className="absolute right-0 bottom-0 left-0 p-6">
-                                    <div className="flex items-end justify-between">
-                                        <div className="space-y-1">
-                                            <h3 className="text-base text-white md:text-lg">{category.title}</h3>
-                                            <p className="text-sm text-white/80">{category.description}</p>
-                                            <p className="text-sm text-white/60">{category.itemCount} items</p>
-                                        </div>
-                                        <div className="translate-x-2 transform rounded-full bg-white p-2 opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100">
-                                            <ArrowRight className="h-5 w-5 text-neutral-900" />
+                                    {/* Content Overlay */}
+                                    <div className="absolute right-0 bottom-0 left-0 p-6">
+                                        <div className="flex items-end justify-between">
+                                            <div className="space-y-1">
+                                                <h3 className="text-base text-white md:text-lg">{category.title}</h3>
+                                                <p className="text-sm text-white/80">{category.description}</p>
+                                                <p className="text-sm text-white/60">
+                                                    {countCategories[categorySlug as keyof CountCategories]} items
+                                                </p>
+                                            </div>
+                                            <div className="translate-x-2 transform rounded-full bg-white p-2 opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100">
+                                                <ArrowRight className="h-5 w-5 text-neutral-900" />
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                    ))}
+                            </Link>
+                        );
+                    })}
                 </div>
             </div>
         </section>

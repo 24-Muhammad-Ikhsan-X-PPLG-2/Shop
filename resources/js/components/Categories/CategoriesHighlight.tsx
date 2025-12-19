@@ -1,3 +1,4 @@
+import { Link } from '@inertiajs/react';
 import { ArrowRight } from 'lucide-react';
 import { ImageWithFallback } from '../ImageWithFallback';
 
@@ -32,10 +33,12 @@ const CategoriesHighlight = () => {
                             </div>
 
                             <div className="flex flex-col gap-4 sm:flex-row">
-                                <button className="flex items-center justify-center gap-2 rounded-full bg-neutral-900 px-8 py-3 text-white transition-colors hover:bg-neutral-800">
-                                    Shop Category
-                                    <ArrowRight className="h-5 w-5" />
-                                </button>
+                                <Link href={'/shop'}>
+                                    <button className="flex cursor-pointer items-center justify-center gap-2 rounded-full bg-neutral-900 px-8 py-3 text-white transition-colors hover:bg-neutral-800">
+                                        Shop Category
+                                        <ArrowRight className="h-5 w-5" />
+                                    </button>
+                                </Link>
                                 <button className="rounded-full border border-neutral-300 bg-white px-8 py-3 text-neutral-900 transition-colors hover:bg-neutral-50">
                                     View Lookbook
                                 </button>

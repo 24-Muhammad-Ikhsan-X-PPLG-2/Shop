@@ -1,15 +1,20 @@
 <?php
 
+use App\Http\Controllers\ApiController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
+// GET
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/shop', [HomeController::class, 'shop'])->name('shop');
 Route::get('/categories', [HomeController::class, 'categories'])->name('categories');
 Route::get('/about', [HomeController::class, 'about'])->name('about');
 Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
+
+// POST
+Route::post('/contact', [HomeController::class, 'contactSend'])->name('contactSend');
 
 // AUTH
 Route::middleware('guest')->group(function () {
@@ -21,6 +26,11 @@ Route::middleware('guest')->group(function () {
 Route::get('/auth/google', [AuthController::class, 'redirectToGoogle'])->name('google.login');
 Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback'])->name('google.callback');
 
-Route::middleware('auth')->group(function() {
+Route::middleware('auth')->group(function () {
     Route::post('/signout', [AuthController::class, 'signOut'])->name('signout');
+});
+
+// API
+Route::prefix('api')->group(function () {
+    Route::get('/getProducts', [ApiController::class, 'getProducts'])->name('getProducts');
 });

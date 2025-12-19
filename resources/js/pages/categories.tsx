@@ -5,9 +5,15 @@ import CategoriesNewslatter from '@/components/Categories/CategoriesNewslatter';
 import CategoriesPromoBanner from '@/components/Categories/CategoriesPromoBanner';
 import Footer from '@/components/Footer';
 import Header from '@/components/Header';
+import { CountCategories } from '@/types/db';
 import { Head } from '@inertiajs/react';
+import { FC } from 'react';
 
-const Categories = () => {
+type CategoriesProps = {
+    countCategories: CountCategories;
+};
+
+const Categories: FC<CategoriesProps> = ({ countCategories }) => {
     return (
         <>
             <Head title="Categories"></Head>
@@ -15,7 +21,7 @@ const Categories = () => {
                 <Header activePage="categories" />
                 <main>
                     <CategoriesHeader />
-                    <CategoriesGrid />
+                    <CategoriesGrid countCategories={countCategories} />
                     <CategoriesHighlight />
                     <CategoriesPromoBanner />
                     <CategoriesNewslatter />

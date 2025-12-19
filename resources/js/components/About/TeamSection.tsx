@@ -24,10 +24,10 @@ const team = [
     },
     {
         id: 4,
-        name: 'Michael Johnson',
-        role: 'Sustainability Director',
+        name: 'Muhammad Ikhsan',
+        role: 'Fullstack Web Developer',
         image: 'https://images.unsplash.com/photo-1672685667592-0392f458f46f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBwb3J0cmFpdCUyMG1hbnxlbnwxfHx8fDE3NjQ5OTM5MDd8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-        description: 'Champion of ethical and eco-friendly practices',
+        description: 'A web and apps technology specialist with 5+ years of experience.',
     },
 ];
 

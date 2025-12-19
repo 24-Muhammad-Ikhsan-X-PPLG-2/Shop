@@ -28,7 +28,7 @@ const ProductGrid: FC<ProductGridProps> = ({ products = null }) => {
                         >
                             <div className="relative h-80 overflow-hidden bg-neutral-50">
                                 <ImageWithFallback
-                                    src={product.image_url}
+                                    src={product.image_url ?? ''}
                                     alt={product.name}
                                     className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                                 />
